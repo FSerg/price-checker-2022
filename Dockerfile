@@ -1,17 +1,16 @@
 FROM node:17.8.0
+ENV NODE_ENV=production
 
-# Commands will run in this directory
-WORKDIR /usr/src/app
-# Copy source code to image
+WORKDIR /app
 COPY . .
 
 # Install dependencies
 RUN cd client && \
-    npm install && \
+    npm install --production && \
     npm run postinstall && \
     cd .. &&\
     \
-    npm install
+    npm install --production
 
 # Build
 RUN cd client && \

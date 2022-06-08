@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:17.8.0
 
 # Commands will run in this directory
 WORKDIR /usr/src/app
@@ -13,7 +13,12 @@ RUN cd client && \
     \
     npm install
 
-RUN chmod +x run
+# Build
+RUN cd client && \
+    npm run build && \
+    cd .. &&\
+    \
+    npm run build
 
 # Build app and start server from script
-CMD ["/usr/src/app/run"]
+CMD [ "node", "dist/index.js" ]

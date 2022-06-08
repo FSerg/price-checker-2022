@@ -40,9 +40,9 @@ const PriceInfo = ({ doc }) => (
       </Grid.Column>
 
       <Grid.Column width={6}>
-        <Statistic.Group>
+        <Statistic.Group size='huge'>
           <PriceOld price={doc.price} priceOld={doc.price_old} />
-          <Statistic size='huge' horizontal>
+          <Statistic horizontal>
             <Statistic.Value>{doc.price}</Statistic.Value>
             <Statistic.Label>руб.</Statistic.Label>
           </Statistic>

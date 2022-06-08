@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimmer, Loader, Form, Input, Message, Grid, Segment, Divider, Image } from 'semantic-ui-react';
+import { Dimmer, Loader, Form, Input, Message, Grid, Segment, Divider, Image, Header } from 'semantic-ui-react';
 import axios from 'axios';
 
 import PriceInfo from './PriceInfo';
@@ -10,17 +10,51 @@ class MainPage extends Component {
         isLoading: false,
         error: '',
         doc: null
+    }
+
+    constructor(props) {
+        super(props);
+        // создадим реф в поле `textInput` для хранения DOM-элемента
+        this.textInput = React.createRef();
+        this.focusTextInput = this.focusTextInput.bind(this);
+        this.timer = null;
+    };
+
+    onFocusWindow = () => {
+        this.focusTextInput();
+    };
+
+    focusTextInput() {
+        // Установим фокус на текстовое поле с помощью чистого DOM API
+        // Примечание: обращаемся к "current", чтобы получить DOM-узел
+        this.textInput.current.focus();
     };
 
     componentDidMount() {
-        this.barcodeInput.focus();
-    }
+        this.focusTextInput();
+        window.addEventListener("focus", this.onFocusWindow)
+    };
+
+    componentWillUnmount() {
+        window.removeEventListener("focus", this.onFocusWindow)
+    };
 
     handleChange = (e, d) => {
         this.setState({ barcode: d.value });
     };
 
+    handleBlur = (e) => {
+        setTimeout(() => {
+            this.focusTextInput();
+        }, 50);
+    };
+
     handleSubmit = () => {
+
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+
         if (this.state.barcode === '') {
             this.setState({ error: '', doc: null });
             return;
@@ -28,13 +62,12 @@ class MainPage extends Component {
 
         this.setState({ error: '', isLoading: true });
         const url = `/api/price?barcode=${this.state.barcode}`;
-        // const url = 'http://localhost:8000/api/price?barcode=4660059310022';
         axios.get(url)
             .then((response) => {
-                // handle success
-                // console.log('response:');
-                // console.log(response);
                 this.setState({ error: '', isLoading: false, doc: response.data.result });
+                this.timer = setTimeout(() => {
+                    this.setState({ doc: null });
+                }, 30000);
             })
             .catch((error) => {
                 let errorMsg = '';
@@ -95,7 +128,12 @@ class MainPage extends Component {
             return (<PriceInfo doc={this.state.doc} />);
         }
 
-        return (<Image src="/logo.png" centered />);
+        return (<>
+            <Image src="/logo.png" centered />
+            <Header size='huge' textAlign='center' color='grey'>
+                Чтобы проверить цену считайте штрих-код товара
+            </Header>
+        </>);
     };
 
     render() {
@@ -106,9 +144,7 @@ class MainPage extends Component {
                 <Form onSubmit={this.handleSubmit}>
                     <Form.Field>
                         <Input
-                            ref={input => {
-                                this.barcodeInput = input;
-                            }}
+                            ref={this.textInput}
                             size="massive"
                             icon="search"
                             fluid
@@ -116,6 +152,7 @@ class MainPage extends Component {
                             loading={this.props.isLoading}
                             value={this.state.barcode}
                             onChange={this.handleChange}
+                            onBlur={this.handleBlur}
                         />
                     </Form.Field>
                 </Form>

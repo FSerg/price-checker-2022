@@ -1,16 +1,15 @@
 FROM node:17.8.0
-ENV NODE_ENV=production
 
 WORKDIR /app
 COPY . .
 
 # Install dependencies
 RUN cd client && \
-    npm install --production && \
+    npm install && \
     npm run postinstall && \
     cd .. &&\
     \
-    npm install --production
+    npm install
 
 # Build
 RUN cd client && \

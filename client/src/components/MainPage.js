@@ -129,7 +129,7 @@ class MainPage extends Component {
         }
 
         return (<>
-            <Image src="/logo.png" centered />
+            <Image src="/barcode1-small.png" centered />
             <Header size='huge' textAlign='center' color='grey'>
                 Чтобы проверить цену считайте штрих-код товара
             </Header>
